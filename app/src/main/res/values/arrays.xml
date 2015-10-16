@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="entryUnits">
+        <item>@string/pref_movie_label</item>
+    </string-array>
+
+    <string-array name="valuesUnits">
+        <item>@string/pref_movie</item>
+    </string-array>
+
+    <string-array name="urlImages">
+        <item>http://www.littlegreenrobot.co.uk/wp-content/themes/littlegreenrobot/images/android_logo_small.png</item>
+        <item>http://static.miniclipcdn.com/content/category/icons/android.png</item>
+        <item>http://mobileawards.com.au/ma2013/images/icon_android.png</item>
+        <item>http://www.simplehelp.net/wp-images/icons/topic_android.png</item>
+        <item>http://www.littlegreenrobot.co.uk/wp-content/themes/littlegreenrobot/images/android_logo_small.png</item>
+        <item>http://static.miniclipcdn.com/content/category/icons/android.png</item>
+        <item>http://mobileawards.com.au/ma2013/images/icon_android.png</item>
+        <item>http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg </item>
+    </string-array>
+</resources>
