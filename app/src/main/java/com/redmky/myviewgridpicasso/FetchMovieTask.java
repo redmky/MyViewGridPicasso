@@ -56,13 +56,13 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
                 //http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=
                 android.net.Uri.Builder builder = new android.net.Uri.Builder();
 
-                builder.scheme("http")
-                        .authority("api.themoviedb.org")
-                        .appendPath("3")
-                        .appendPath("discover")
-                        .appendPath("movie")
-                        .appendQueryParameter("sort_by", params[0])
-                        .appendQueryParameter("api_key", "");
+            builder.scheme("http")
+                    .authority("api.themoviedb.org")
+                    .appendPath("3")
+                    .appendPath("discover")
+                    .appendPath("movie")
+                    .appendQueryParameter("sort_by", params[0])
+                    .appendQueryParameter("api_key", "");
 
                 String myUrl = builder.build().toString();
 
@@ -143,6 +143,7 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
         final String OWM_OVERVIEW = "overview";
         final String OWM_DATE = "release_date";
         final String OWM_POPULARITY = "popularity";
+        final String OWM_ID = "id";
 
         org.json.JSONObject movieJson = new org.json.JSONObject(forecastJsonStr);
         org.json.JSONArray movieArray = movieJson.getJSONArray(OWM_RESULTS);
@@ -156,6 +157,7 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
         String poster;
         String synopsis;
         float popularity;
+        String id;
 
         for (int i = 0; i < movieArray.length(); i++) {
 
@@ -169,9 +171,10 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
             poster = "http://image.tmdb.org/t/p/w185" + image;
             synopsis = movieResults.getString(OWM_OVERVIEW);
             popularity = Float.parseFloat(movieResults.getString(OWM_POPULARITY));
+            id = movieResults.getString(OWM_ID);
 
             MovieInfo movie =
-                    new MovieInfo(title, release_date, poster, vote, synopsis, popularity);
+                    new MovieInfo(title, release_date, poster, vote, synopsis, popularity, id);
 
             resultStrs[i] = movie;
         }

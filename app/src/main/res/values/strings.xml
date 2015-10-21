@@ -8,17 +8,19 @@
     <string name="pref_movie_key">sort</string>
     <string name="pref_sort_by_default" translatetable="false">popularity.desc</string>
 
+    <string name="pref_movie_popularity" translatable="false">popularity.desc</string>
+    <string name="pref_movie_rating" translatable="false">vote_average.desc</string>
     <string name="pref_movie_label_popularity" translatable="false">Popularity</string>
     <string name="pref_movie_label_rating" translatable="false">Vote Average</string>
 
-    <string name="pref_movie_popularity" translatable="false">popularity.desc</string>
-    <string name="pref_movie_rating" translatable="false">vote_average.desc</string>
 
     <string name="title_activity_detail">Movie Details</string>
 
     <string name="list_item_vote_textview">Vote: </string>
     <string name="list_item_popularity_textview">Popularity: </string>
     <string name="list_item_releaseDate_textview">Release Date: </string>
+    <string name="list_item_trailer_textview">Trailer: </string>
+    <string name="list_item_review_textview">Reviews: </string>
 
 
 </resources>

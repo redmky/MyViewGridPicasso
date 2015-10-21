@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:layout_gravity="center_vertical"
-              android:minHeight="?android:attr/listPreferredItemHeight"
-              android:paddingTop="10dp">
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center_vertical"
+    android:fillViewport="true"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="#74000a"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/list_item_title_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/list_item_title_textview"
-            android:text="Title"
             android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Title"
+            android:textColor="#ffffff"
+            android:textIsSelectable="true"
+            android:textSize="24dp"
             android:textStyle="bold">
         </TextView>
 
@@ -27,69 +35,149 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_gravity="center"
+        android:layout_weight=".5"
+        android:clickable="true"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <ImageView
+        <TextView
+            android:id="@+id/list_item_releaseDate_textview"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:background="@android:color/background_dark"
+            android:gravity="center"
+            android:text="@string/list_item_releaseDate_textview"
+            android:textColor="#ffffff"
+            android:textSize="12dp">
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
             android:id="@+id/movie_item_poster"
-            android:scaleType="centerCrop"
-            android:minWidth="185dp"
-            android:minHeight="200dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        android:layout_weight="4"
-        android:scrollbars = "vertical">
-
-        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/list_item_synopsis_textview"
-            android:text="Synopsis">
-        </TextView>
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:adjustViewBounds="false"
+            android:minHeight="200dp"
+            android:minWidth="185dp"
+            android:scaleType="centerCrop"/>
 
     </LinearLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal">
+        android:layout_weight="5"
+        android:fillViewport="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:fillViewport="true"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:showDividers="beginning|end">
+
+                <TextView
+                    android:id="@+id/list_item_vote_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2"
+                    android:text="@string/list_item_vote_textview">
+                </TextView>
+
+                <Button
+                    android:id="@+id/buttonFavorite"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Add As Favorite"/>
+
+                <TextView
+                    android:id="@+id/list_item_popularity_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2"
+                    android:text="@string/list_item_popularity_textview">
+                </TextView>
+            </LinearLayout>
 
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/list_item_vote_textview"
-            android:text="@string/list_item_vote_textview">
-        </TextView>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/list_item_popularity_textview"
-            android:text="@string/list_item_popularity_textview">
-        </TextView>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/list_item_releaseDate_textview"
-            android:text="@string/list_item_releaseDate_textview">
-        </TextView>
-
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/list_item_synopsis_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Synopsis">
+                </TextView>
+            </LinearLayout>
 
 
+            <LinearLayout
+                android:id="@+id/trailer_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:clickable="true"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
+
+                <TextView
+                    android:id="@+id/list_item_trailer_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/list_item_trailer_textview">
+                </TextView>
+
+                <ImageView
+                    android:id="@+id/movie_trailer_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/ic_play"/>
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/reviews_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <ListView
+                    android:id="@+id/listview_reviews"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp">
+
+                </ListView>
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

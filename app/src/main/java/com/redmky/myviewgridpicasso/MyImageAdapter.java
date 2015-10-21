@@ -22,7 +22,7 @@ public class MyImageAdapter extends android.widget.ArrayAdapter<MovieInfo> {
     //private ArrayAdapter<MovieInfo> mMovieAdapter;
     private ArrayList<MovieInfo> mMovieData = new ArrayList<MovieInfo>();
 
-    public MyImageAdapter(Context context,int layoutResourceId, ArrayList<MovieInfo> mMovieData) {
+    public MyImageAdapter(Context context, int layoutResourceId, ArrayList<MovieInfo> mMovieData) {
         super(context, layoutResourceId, mMovieData);
         this.mContext = context;
         this.layoutResourceId = layoutResourceId;
@@ -67,7 +67,7 @@ public class MyImageAdapter extends android.widget.ArrayAdapter<MovieInfo> {
             android.view.LayoutInflater inflater = ((android.app.Activity) mContext).getLayoutInflater();
             imageView = inflater.inflate(layoutResourceId, parent, false);
 
-            holder = (android.widget.ImageView)imageView.findViewById(com.redmky.myviewgridpicasso.R.id.imageView1);
+            holder = (android.widget.ImageView) imageView.findViewById(com.redmky.myviewgridpicasso.R.id.imageView1);
             imageView.setTag(holder);
 
         } else {
@@ -78,6 +78,8 @@ public class MyImageAdapter extends android.widget.ArrayAdapter<MovieInfo> {
 
         Picasso.with(mContext)
                 .load(movieItem.poster)
+                .placeholder(com.redmky.myviewgridpicasso.R.mipmap.ic_downloading)
+                .error(com.redmky.myviewgridpicasso.R.mipmap.ic_error)
                 .into(holder);
 
         return imageView;

@@ -3,9 +3,9 @@
 
 
     <ListPreference
-        android:title="@string/pref_movie_settings"
-        android:key="@string/pref_movie_key"
         android:defaultValue="@string/pref_sort_by_default"
         android:entries="@array/SpinnerEntry"
-        android:entryValues="@array/SpinnerValue" />
+        android:entryValues="@array/SpinnerValue"
+        android:key="@string/pref_movie_key"
+        android:title="@string/pref_movie_settings"/>
 </PreferenceScreen>

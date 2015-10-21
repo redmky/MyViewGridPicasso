@@ -4,27 +4,28 @@ package com.redmky.myviewgridpicasso;
  * Created by redmky on 10/18/2015.
  */
 public class SettingsActivity extends android.preference.PreferenceActivity
-    implements android.preference.Preference.OnPreferenceChangeListener {
-
-        @Override
-        public void onCreate(android.os.Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            // Add 'general' preferences, defined in the XML file
-            // Add a button to the header list.
-            addPreferencesFromResource(R.xml.pref_general);
+        implements android.preference.Preference.OnPreferenceChangeListener {
 
 
-            // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
-            // updated when the preference changes.
-            // TODO: Add preferences
-            bindPreferenceSummaryToValue(findPreference(getString(com.redmky.myviewgridpicasso.R.string.pref_movie_key)));
-        }
+    @Override
+    public void onCreate(android.os.Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Add 'general' preferences, defined in the XML file
+        // Add a button to the header list.
+        addPreferencesFromResource(R.xml.pref_general);
 
-        /**
-         * Attaches a listener so the summary is always updated with the preference value.
-         * Also fires the listener once, to initialize the summary (so it shows up before the value
-         * is changed.)
-         */
+
+        // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
+        // updated when the preference changes.
+        // TODO: Add preferences
+        bindPreferenceSummaryToValue(findPreference(getString(com.redmky.myviewgridpicasso.R.string.pref_movie_key)));
+    }
+
+    /**
+     * Attaches a listener so the summary is always updated with the preference value.
+     * Also fires the listener once, to initialize the summary (so it shows up before the value
+     * is changed.)
+     */
     private void bindPreferenceSummaryToValue(android.preference.Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(this);
@@ -34,7 +35,7 @@ public class SettingsActivity extends android.preference.PreferenceActivity
         onPreferenceChange(preference,
                 android.preference.PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+                        .getString(preference.getKey(), ((android.preference.ListPreference) preference).getValue()));
     }
 
     @Override
@@ -47,6 +48,11 @@ public class SettingsActivity extends android.preference.PreferenceActivity
             android.preference.ListPreference listPreference = (android.preference.ListPreference) preference;
             int prefIndex = listPreference.findIndexOfValue(stringValue);
             if (prefIndex >= 0) {
+                if (((android.preference.ListPreference) preference).getValue() != stringValue) {
+                    //call to get movie data
+                    com.redmky.myviewgridpicasso.MainActivity.getMovieData(stringValue);
+                }
+
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
             }
         } else {

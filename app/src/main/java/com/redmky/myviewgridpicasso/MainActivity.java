@@ -13,43 +13,82 @@ import static com.redmky.myviewgridpicasso.R.string.pref_movie_popularity;
 
 public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
+    private static android.content.Context mContext;
+    private static ArrayList<MovieInfo> mMovieData;
+    private static MyImageAdapter mGridAdapter;
+    private static ArrayList<MovieByIdInfo> mTrailerData;
+    private static ArrayList<MovieByIdInfo> mReviewData;
     private android.widget.GridView mGridView;
 
-    private ArrayList<MovieInfo> mMovieData;
-    private MyImageAdapter mGridAdapter;
+    //Get Movie Data
+    public static void getMovieData(String sortBy) {
+        //call to get movie data
+        FetchMovieTask movieTask = new FetchMovieTask(mMovieData, mGridAdapter);
+        movieTask.execute(sortBy);
+    }
 
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(layout.activity_main);
 
+        mContext = this;
+        setContentView(layout.activity_main);
         mGridView = (android.widget.GridView) findViewById(R.id.gridView);
 
-        //initialize with empty data
-        mMovieData = new ArrayList<>();
-        mGridAdapter = new MyImageAdapter(this, layout.item_list, mMovieData);
+        if (savedInstanceState != null) {
+            mMovieData =
+                    (java.util.ArrayList<MovieInfo>)
+                            savedInstanceState.get("MOVIE_KEY");
+
+            mTrailerData =
+                    (java.util.ArrayList<com.redmky.myviewgridpicasso.MovieByIdInfo>)
+                            savedInstanceState.get("TRAILER_KEY");
+
+            mReviewData =
+                    (java.util.ArrayList<com.redmky.myviewgridpicasso.MovieByIdInfo>)
+                            savedInstanceState.get("REVIEW_KEY");
+
+            mGridAdapter = new MyImageAdapter(this, layout.item_list, mMovieData);
+
+        } else {
+
+            //initialize with empty data
+            mMovieData = new ArrayList<>();
+            mTrailerData = new ArrayList<>();
+            mReviewData = new ArrayList<>();
+            mGridAdapter = new MyImageAdapter(this, layout.item_list, mMovieData);
+
+            //Get Movie data and call movieTask
+            //obtaining how to sort by
+            android.content.SharedPreferences prefs =
+                    android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+
+            String sortBy = prefs.getString(getString(R.string.pref_movie_key),
+                    getString(R.string.pref_sort_by_default));
+            getMovieData(sortBy);
+        }
+
         mGridView.setAdapter(mGridAdapter);
 
         //Grid view click
         mGridView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             public void onItemClick(android.widget.AdapterView<?> parent, android.view.View v, int position, long id) {
                 //Get item at position
-                MovieInfo item = (MovieInfo) parent.getItemAtPosition(position);
-                //Pass the image title and url to DetailsActivity
-                android.content.Intent intent = new android.content.Intent(MainActivity.this, com.redmky.myviewgridpicasso.MovieDetails.class);
-                intent.putExtra("title", item.title);
-                intent.putExtra("image", item.poster);
-                intent.putExtra("vote", item.vote);
-                intent.putExtra("pop", item.popularity);
-                intent.putExtra("synopsis", item.synopsis);
-                intent.putExtra("releaseDate", item.release_date);
-                //Start details activity
-                startActivity(intent);
+                MovieInfo movieItem = (MovieInfo) parent.getItemAtPosition(position);
+
+                //get the url for the movie trailer
+                getTrailerUrl(movieItem.id, movieItem);
+
             }
         });
+    }
 
-        //Get Movie data and call movieTask
-        getMovieData();
+    @Override
+    protected void onSaveInstanceState(android.os.Bundle outState) {
+        outState.putParcelableArrayList("MOVIE_KEY", mMovieData);
+        outState.putParcelableArrayList("TRAILER_KEY", mTrailerData);
+        outState.putParcelableArrayList("REVIEW_KEY", mReviewData);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -70,30 +109,31 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new android.content.Intent(this, SettingsActivity.class));
-
-            //mGridAdapter.setGridData(mMovieData);
-            //instead of the above, using below to hope to refresh faster but no luck ????
-            getMovieData();
-
-            //sortMovies();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    //Get Movie Data
-    private void getMovieData() {
-        //obtaining how to sort by
-        android.content.SharedPreferences prefs =
-                android.preference.PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+    //Get Movie trailer URL
+    private void getTrailerUrl(String id, MovieInfo movieItem) {
 
-        String sortBy = prefs.getString(getString(R.string.pref_movie_key),
-                getString(R.string.pref_sort_by_default));
 
         //call to get movie data
-        FetchMovieTask movieTask = new FetchMovieTask(mMovieData, mGridAdapter);
-        movieTask.execute(sortBy);
+        FetchDataByIdTask reviewTask =
+                new FetchDataByIdTask(mContext, mTrailerData, mReviewData, movieItem);
+
+        //get data review
+        //this then calls fetch trailer data
+        reviewTask.execute(id, "reviews"); //reviews
+
+        //call to get movie data
+        FetchDataByIdTask trailerTask =
+                new FetchDataByIdTask(mContext, mTrailerData, mReviewData, movieItem);
+
+        trailerTask.execute(id, "videos"); //trailers
+
+
     }
 
     //to sort my current list instead of using API
@@ -110,8 +150,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
         if (sortBy.equals(getString(pref_movie_popularity))) {
             java.util.Collections.sort(mMovieData, MovieInfo.moviePop);
-        }
-        else if (sortBy.equals(getString(com.redmky.myviewgridpicasso.R.string.pref_movie_rating))) {
+        } else if (sortBy.equals(getString(com.redmky.myviewgridpicasso.R.string.pref_movie_rating))) {
             java.util.Collections.sort(mMovieData, MovieInfo.movieVote);
         }
 
