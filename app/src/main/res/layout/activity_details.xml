@@ -57,7 +57,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_weight="3"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -89,7 +89,7 @@
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight=".75"
                 android:orientation="horizontal"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
@@ -108,7 +108,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Add As Favorite"/>
+                    android:text="@string/favorite_button"/>
 
                 <TextView
                     android:id="@+id/list_item_popularity_textview"
@@ -121,8 +121,9 @@
 
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
                 android:orientation="horizontal">
 
                 <TextView
@@ -138,7 +139,7 @@
                 android:id="@+id/trailer_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:clickable="true"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal">
@@ -165,15 +166,17 @@
 
             <LinearLayout
                 android:id="@+id/reviews_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal">
 
                 <ListView
                     android:id="@+id/listview_reviews"
                     android:layout_width="wrap_content"
-                    android:layout_height="120dp">
+                    android:minHeight="120dp"
+                    android:layout_height="fill_parent">
 
                 </ListView>
 

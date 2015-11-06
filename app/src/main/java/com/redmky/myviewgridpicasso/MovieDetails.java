@@ -1,14 +1,29 @@
 package com.redmky.myviewgridpicasso;
 
+import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+import android.app.Application;
+
+import com.redmky.myviewgridpicasso.Data.ArchivedMovieColumns;
+import com.redmky.myviewgridpicasso.Data.MovieProvider;
 
 /**
  * Created by redmky on 10/19/2015.
  */
 public class MovieDetails extends android.support.v7.app.ActionBarActivity {
+    private static final String LOG_TAG = MovieDetails.class.getSimpleName();
 
     String trailerUrl;
     java.util.ArrayList<MovieByIdInfo> mReviewData;
+
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,12 +34,15 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
         android.content.Intent intent = getIntent();
         if (intent != null) {
 
-            String image = intent.getStringExtra("image");
-            String title = intent.getStringExtra("title");
-            float vote = intent.getFloatExtra("vote", 0);
+            final int position = intent.getIntExtra("position",0);
+            final String image = intent.getStringExtra("image");
+            final String title = intent.getStringExtra("title");
+            final float vote = intent.getFloatExtra("vote", 0);
             float popularity = intent.getFloatExtra("pop", 0);
-            String synopsis = intent.getStringExtra("synopsis");
-            String releaseDate = intent.getStringExtra("releaseDate");
+            final String synopsys = intent.getStringExtra("synopsis");
+            final String releaseDate = intent.getStringExtra("releaseDate");
+            final String id = intent.getStringExtra("id");
+            final boolean favorite = intent.getBooleanExtra("favorite", false);
             trailerUrl = intent.getStringExtra("trailerUrl");
             mReviewData =
                     (java.util.ArrayList<MovieByIdInfo>) intent.getSerializableExtra("reviews");
@@ -39,7 +57,7 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
             android.widget.TextView rDateTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_releaseDate_textview);
             rDateTextView.setText("Release Date: " + String.valueOf(releaseDate));
             android.widget.TextView synopsisTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_synopsis_textview);
-            synopsisTextView.setText(synopsis);
+            synopsisTextView.setText(synopsys);
 
             //Set image url
             android.widget.ImageView imageView = (android.widget.ImageView) findViewById(R.id.movie_item_poster);
@@ -48,24 +66,85 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
                     .placeholder(com.redmky.myviewgridpicasso.R.mipmap.ic_downloading)
                     .error(com.redmky.myviewgridpicasso.R.mipmap.ic_error)
                     .into(imageView);
+
+
+            //intent to play trailer
             if (!trailerUrl.equals("none")) {
                 android.widget.LinearLayout TrailerLayout = (android.widget.LinearLayout) findViewById(com.redmky.myviewgridpicasso.R.id.trailer_layout);
                 TrailerLayout.setOnClickListener(new android.view.View.OnClickListener() {
                     public void onClick(android.view.View v) {
                         android.content.Intent intentTrailer = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(trailerUrl));
                         startActivity(intentTrailer);
-        }
+                    }
                 });
             }
-        //if (savedInstanceState == null) {
-        //    getSupportFragmentManager().beginTransaction()
-        //            .add(com.redmky.myviewgridpicasso.R.id.gridView, new DetailFragment())
+
+            // Create the adapter for the movie reviews data
             ReviewsAdapter adapter = new ReviewsAdapter(this, mReviewData);
-        //            .commit();
+            // Attach the adapter to a ListView
             android.widget.ListView RlistView =
                     (android.widget.ListView) findViewById(R.id.listview_reviews);
             RlistView.setAdapter(adapter);
+
+            //if button click add to favorite
+            //save movie details to database
+            final Button button = (Button) findViewById(R.id.buttonFavorite);
+            final boolean[] favChange = {favorite};
+
+            if (favorite) {
+                button.setText("Remove From Favorites");
+            }
+            else {
+                button.setText("Add to Favorites");
+            }
+
+            final Context mC = this;
+            button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    // Perform action on click
+                    if (favorite) {
+                        button.setText("Removed From Favorites");
+                        favChange[0] = false;
+                        //TODO: remove from favorites
+                    } else {
+                        insertToFavorites(mC, image, title, vote, synopsys, releaseDate, id);
+                        button.setText("Added to Favorites");
+                        favChange[0] = true;
+
+                        //change fav back to main activity
+                        Intent intentBack = new Intent();
+                        intentBack.putExtra("position", position);
+                        intentBack.putExtra("favorite", favChange[0]);
+                        setResult(RESULT_OK, intentBack);
+                    }
+                }
+            });
+        }
     }
+
+
+    public static void insertToFavorites(Context mC, String image,
+                                         String title,
+                                         float votes,
+                                         String synopsys,
+                                         String releaseDate,
+                                         String id){
+
+        ContentValues cv = new ContentValues();
+
+        //cv.put(ArchivedMovieColumns._ID, 1);
+        cv.put(ArchivedMovieColumns.NAME, title);
+        cv.put(ArchivedMovieColumns.IMAGE_RESOURCE, image);
+        cv.put(ArchivedMovieColumns.VOTES, votes);
+        cv.put(ArchivedMovieColumns.SYNOPSYS, synopsys);
+        cv.put(ArchivedMovieColumns.RELEASE_DATE, releaseDate);
+        cv.put(ArchivedMovieColumns.MOVIE_ID, id);
+
+        Uri uri = mC.getContentResolver().insert(MovieProvider.ArchivedMovies.CONTENT_URI, cv);
+
+        Toast.makeText(((Activity)mC).getBaseContext(),
+                uri.toString(), Toast.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -80,8 +159,18 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+
+        //added to work the mas as main back button press
+        //this will call onActivityResult
+        //super.onBackPressed();
+
+        // Respond to the action bar's Up/Home button
+        case android.R.id.home:
+        onBackPressed();
+        return true;
+    }
 
         return super.onOptionsItemSelected(item);
     }
-
 }

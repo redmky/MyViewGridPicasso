@@ -1,31 +1,28 @@
 package com.redmky.myviewgridpicasso;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 
 import com.redmky.myviewgridpicasso.R.layout;
 
 import java.util.ArrayList;
-
-import static android.preference.PreferenceManager.getDefaultSharedPreferences;
-import static com.redmky.myviewgridpicasso.R.string.pref_movie_key;
-import static com.redmky.myviewgridpicasso.R.string.pref_movie_popularity;
 
 public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
     private static android.content.Context mContext;
     private static ArrayList<MovieInfo> mMovieData;
     private static MyImageAdapter mGridAdapter;
-    private static ArrayList<MovieByIdInfo> mTrailerData;
-    private static ArrayList<MovieByIdInfo> mReviewData;
-    private android.widget.GridView mGridView;
-
-    //Get Movie Data
-    public static void getMovieData(String sortBy) {
-        //call to get movie data
-        FetchMovieTask movieTask = new FetchMovieTask(mMovieData, mGridAdapter);
-        movieTask.execute(sortBy);
-    }
+    protected android.widget.GridView mGridView;
+    static MovieInfo mMovieItem;
 
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState) {
@@ -40,22 +37,17 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                     (java.util.ArrayList<MovieInfo>)
                             savedInstanceState.get("MOVIE_KEY");
 
-            mTrailerData =
-                    (java.util.ArrayList<com.redmky.myviewgridpicasso.MovieByIdInfo>)
-                            savedInstanceState.get("TRAILER_KEY");
-
-            mReviewData =
-                    (java.util.ArrayList<com.redmky.myviewgridpicasso.MovieByIdInfo>)
-                            savedInstanceState.get("REVIEW_KEY");
+            mMovieItem = (MovieInfo)savedInstanceState.get("MOVIE_ITEM");
 
             mGridAdapter = new MyImageAdapter(this, layout.item_list, mMovieData);
+
+            //todo clean get detail activity if change from popular to fav
+            movieDetailActivity();
 
         } else {
 
             //initialize with empty data
             mMovieData = new ArrayList<>();
-            mTrailerData = new ArrayList<>();
-            mReviewData = new ArrayList<>();
             mGridAdapter = new MyImageAdapter(this, layout.item_list, mMovieData);
 
             //Get Movie data and call movieTask
@@ -74,21 +66,29 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         mGridView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             public void onItemClick(android.widget.AdapterView<?> parent, android.view.View v, int position, long id) {
                 //Get item at position
-                MovieInfo movieItem = (MovieInfo) parent.getItemAtPosition(position);
+                mMovieItem = (MovieInfo) parent.getItemAtPosition(position);
+                mMovieItem.position = position;
 
                 //get the url for the movie trailer
-                getTrailerUrl(movieItem.id, movieItem);
+                getReviewsAndTrailerUrl(mMovieItem.id, mMovieItem);
 
             }
         });
+
+    }
+
+    //Get Movie Data
+    public static void getMovieData(String sortBy) {
+        //call to get movie data
+        FetchMovieTask movieTask = new FetchMovieTask(mMovieData, mGridAdapter);
+        movieTask.execute(sortBy);
     }
 
     @Override
-    protected void onSaveInstanceState(android.os.Bundle outState) {
-        outState.putParcelableArrayList("MOVIE_KEY", mMovieData);
-        outState.putParcelableArrayList("TRAILER_KEY", mTrailerData);
-        outState.putParcelableArrayList("REVIEW_KEY", mReviewData);
-        super.onSaveInstanceState(outState);
+    protected void onSaveInstanceState(android.os.Bundle savedInstanceState) {
+        savedInstanceState.putParcelableArrayList("MOVIE_KEY", mMovieData);
+        savedInstanceState.putParcelable("MOVIE_ITEM", mMovieItem);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -116,46 +116,167 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     }
 
     //Get Movie trailer URL
-    private void getTrailerUrl(String id, MovieInfo movieItem) {
+    private void getReviewsAndTrailerUrl(String id, MovieInfo movieItem) {
 
 
         //call to get movie data
         FetchDataByIdTask reviewTask =
-                new FetchDataByIdTask(mContext, mTrailerData, mReviewData, movieItem);
+                new FetchDataByIdTask(mMovieItem);
 
         //get data review
         //this then calls fetch trailer data
-        reviewTask.execute(id, "reviews"); //reviews
+        reviewTask.execute(mMovieItem.id, "reviews"); //reviews
 
         //call to get movie data
         FetchDataByIdTask trailerTask =
-                new FetchDataByIdTask(mContext, mTrailerData, mReviewData, movieItem);
+                new FetchDataByIdTask(mMovieItem);
 
-        trailerTask.execute(id, "videos"); //trailers
-
-
+        trailerTask.execute(mMovieItem.id, "videos"); //trailers
     }
 
-    //to sort my current list instead of using API
-    //currently not being use
-    private void sortMovies() {
+    private static boolean isTwoPane() {
 
-        //obtaining how to sort by
-        android.content.SharedPreferences prefs =
-                getDefaultSharedPreferences(this);
+        boolean twoPane;
+        int screenSize = mContext.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK;
+        twoPane = screenSize > Configuration.SCREENLAYOUT_SIZE_NORMAL;
+        return twoPane;
+    }
 
-        String sortBy = prefs.getString(getString(pref_movie_key),
-                getString(pref_movie_popularity));
+    public static void movieDetailActivity() {
+
+        //Start details activity
+        if(isTwoPane()) {
+
+            setDetailActivity();
+        }
+        else {
+            MovieByIdInfo tempMovieInfo = mMovieItem.trailerData.get(0);
+            final String trailerUrl = tempMovieInfo.key;
+            //todo use the array instead of one item
+
+            //Pass the image title and url to DetailsActivity
+            android.content.Intent intent = new android.content.Intent(mContext, com.redmky.myviewgridpicasso.MovieDetails.class);
+            intent.putExtra("position", mMovieItem.position );
+            intent.putExtra("title", mMovieItem.title);
+            intent.putExtra("image", mMovieItem.poster);
+            intent.putExtra("vote", mMovieItem.vote);
+            intent.putExtra("pop", mMovieItem.popularity);
+            intent.putExtra("synopsis", mMovieItem.synopsis);
+            intent.putExtra("releaseDate", mMovieItem.release_date);
+            intent.putExtra("trailerUrl", trailerUrl);
+            intent.putExtra("reviews", mMovieItem.reviewData);
+            intent.putExtra("id", mMovieItem.id);
+            intent.putExtra("favorite", mMovieItem.favorite);
+            //need  startActivityForResult to keep track of favorites, data send back to mainActivity
+            // mContext.startActivity(intent);
+            int mRequestCode = 100;
+            ((Activity) mContext).startActivityForResult(intent, mRequestCode);
+        }
+    }
+
+    public static void setDetailActivity()
+    {
+        final int position = mMovieItem.position;
+        final String image = mMovieItem.poster;
+        final String title = mMovieItem.title;
+        final float vote = mMovieItem.vote;
+        float popularity = mMovieItem.popularity;
+        final String synopsys = mMovieItem.synopsis;
+        final String releaseDate = mMovieItem.release_date;
+        final String id = mMovieItem.id;
+        final boolean favorite = mMovieItem.favorite;
+
+        //initialize and set the image description
+        android.widget.TextView titleTextView = (android.widget.TextView) ((Activity)mContext).findViewById(com.redmky.myviewgridpicasso.R.id.list_item_title_textview);
+        titleTextView.setText(title);
+        android.widget.TextView voteTextView = (android.widget.TextView) ((Activity)mContext).findViewById(com.redmky.myviewgridpicasso.R.id.list_item_vote_textview);
+        voteTextView.setText("Rating: " + String.valueOf(vote));
+        android.widget.TextView popTextView = (android.widget.TextView) ((Activity)mContext).findViewById(com.redmky.myviewgridpicasso.R.id.list_item_popularity_textview);
+        popTextView.setText("Popularity: " + String.valueOf(popularity));
+        android.widget.TextView rDateTextView = (android.widget.TextView) ((Activity)mContext).findViewById(com.redmky.myviewgridpicasso.R.id.list_item_releaseDate_textview);
+        rDateTextView.setText("Release Date: " + String.valueOf(releaseDate));
+        android.widget.TextView synopsisTextView = (android.widget.TextView) ((Activity)mContext).findViewById(com.redmky.myviewgridpicasso.R.id.list_item_synopsis_textview);
+        synopsisTextView.setText(synopsys);
+
+        //Set image url
+        android.widget.ImageView imageView = (android.widget.ImageView) ((Activity)mContext).findViewById(R.id.movie_item_poster);
+        com.squareup.picasso.Picasso.with(mContext)
+                .load(image)
+                .placeholder(com.redmky.myviewgridpicasso.R.mipmap.ic_downloading)
+                .error(com.redmky.myviewgridpicasso.R.mipmap.ic_error)
+                .into(imageView);
 
 
-        if (sortBy.equals(getString(pref_movie_popularity))) {
-            java.util.Collections.sort(mMovieData, MovieInfo.moviePop);
-        } else if (sortBy.equals(getString(com.redmky.myviewgridpicasso.R.string.pref_movie_rating))) {
-            java.util.Collections.sort(mMovieData, MovieInfo.movieVote);
+        //intent to play trailer
+        MovieByIdInfo tempMovieInfo = mMovieItem.trailerData.get(0);
+        final String trailerUrl = tempMovieInfo.key;
+        //todo use the array instead of one item
+        if (!trailerUrl.equals("none")) {
+            android.widget.LinearLayout TrailerLayout = (android.widget.LinearLayout) ((Activity)mContext).findViewById(com.redmky.myviewgridpicasso.R.id.trailer_layout);
+            TrailerLayout.setOnClickListener(new android.view.View.OnClickListener() {
+                public void onClick(android.view.View v) {
+                    android.content.Intent intentTrailer = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(trailerUrl));
+                    mContext.startActivity(intentTrailer);
+                }
+            });
         }
 
-        //refresh view
-        mGridAdapter.setGridData(mMovieData);
+        // Create the adapter for the movie reviews data
+        ReviewsAdapter adapter = new ReviewsAdapter(mContext, mMovieItem.reviewData);
+        // Attach the adapter to a ListView
+        android.widget.ListView RlistView =
+                (android.widget.ListView) ((Activity)mContext).findViewById(R.id.listview_reviews);
+        RlistView.setAdapter(adapter);
+
+        //if button click add to favorite
+        //save movie details to database
+        final Button button = (Button) ((Activity)mContext).findViewById(R.id.buttonFavorite);
+        final boolean[] favChange = {favorite};
+
+        if (favorite) {
+            button.setText("Remove From Favorites");
+        }
+        else {
+            button.setText("Add to Favorites");
+        }
+
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                if (favorite) {
+                    button.setText("Removed From Favorites");
+                    favChange[0] = false;
+                    //TODO: remove from favorites
+                } else {
+                    MovieDetails.insertToFavorites(mContext, image, title, vote, synopsys, releaseDate, id);
+                    button.setText("Added to Favorites");
+
+                    MovieInfo tempInfo = mMovieData.get(position);
+                    tempInfo.favorite = true;
+                    mMovieData.set(position, tempInfo);
+
+                }
+            }
+        });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100) {
+            if (resultCode == Activity.RESULT_OK) {
+                int position = data.getIntExtra("position",0);
+                boolean fav = data.getBooleanExtra("favorite", false);
+
+                MovieInfo tempInfo = mMovieData.get(position);
+                tempInfo.favorite = fav;
+                mMovieData.set(position, tempInfo);
+            }
+        }
+    }
+
+
+
 }
 

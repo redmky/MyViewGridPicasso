@@ -1,5 +1,13 @@
 package com.redmky.myviewgridpicasso;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.view.View;
+import android.widget.Button;
+
+import java.util.ArrayList;
+
 import static java.util.Collections.addAll;
 
 /**
@@ -10,39 +18,14 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
 
     //private final String LOG_TAG = FetchDataByIdTask.class.getSimpleName();
 
-    private java.util.ArrayList<MovieByIdInfo> mTrailerData;
-    private java.util.ArrayList<MovieByIdInfo> mReviewData;
-    private android.content.Context mContext;
+   // private java.util.ArrayList<MovieByIdInfo> mTrailerData;
+   // private java.util.ArrayList<MovieByIdInfo> mReviewData;
 
     //for holding info of what item the user clicked
-    private MovieInfo movieItem;
+    private MovieInfo mMovieItem;
 
-    public FetchDataByIdTask(android.content.Context mContext,
-                             java.util.ArrayList<MovieByIdInfo> TrailerData,
-                             java.util.ArrayList<MovieByIdInfo> ReviewData,
-                             MovieInfo movieItem) {
-        this.mContext = mContext;
-        this.mTrailerData = TrailerData;
-        this.mReviewData = ReviewData;
-        this.movieItem = movieItem;
-    }
-
-    public void movieDetailActivity(String trailerUrl) {
-        //Pass the image title and url to DetailsActivity
-        android.content.Intent intent = new android.content.Intent(mContext, com.redmky.myviewgridpicasso.MovieDetails.class);
-        intent.putExtra("title", movieItem.title);
-        intent.putExtra("image", movieItem.poster);
-        intent.putExtra("vote", movieItem.vote);
-        intent.putExtra("pop", movieItem.popularity);
-        intent.putExtra("synopsis", movieItem.synopsis);
-        intent.putExtra("releaseDate", movieItem.release_date);
-        intent.putExtra("trailerUrl", trailerUrl);
-        intent.putExtra("reviews", mReviewData);
-
-        //Start details activity
-        mContext.startActivity(intent);
-
-
+    public FetchDataByIdTask( MovieInfo movieItem) {
+        this.mMovieItem = movieItem;
     }
 
     @Override
@@ -50,16 +33,20 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
 
         if (result != null) {
             if (result[0].mode.equals("movies")) {
-                mTrailerData.clear();
+                //mTrailerData.clear();
 
+                java.util.ArrayList<MovieByIdInfo> mTrailerData = new ArrayList<>();
                 addAll(mTrailerData, result);
+                mMovieItem.trailerData = mTrailerData;
                 //call activity to display movie details
                 //at the moment we only care about one trailer
-                movieDetailActivity(result[0].key);
+                MainActivity.movieDetailActivity();
             } else if (result[0].mode.equals("reviews")) {
-                mReviewData.clear();
+                //mReviewData.clear();
 
+                java.util.ArrayList<MovieByIdInfo> mReviewData = new ArrayList<>();
                 addAll(mReviewData, result);
+                mMovieItem.reviewData = mReviewData;
             }
         }
     }
@@ -84,7 +71,7 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
                     .appendPath("movie")
                     .appendPath(params[0])
                     .appendPath(params[1])
-                    .appendQueryParameter("api_key", "");
+                    .appendQueryParameter("api_key", "44ef3f244772171afeaada468c1c1e85");
 
             String myUrl = builder.build().toString();
 

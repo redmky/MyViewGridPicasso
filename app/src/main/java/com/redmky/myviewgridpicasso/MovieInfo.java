@@ -3,7 +3,7 @@ package com.redmky.myviewgridpicasso;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 
 /**
  * Created by redmky on 10/18/2015.
@@ -24,48 +24,31 @@ public class MovieInfo implements Parcelable {
             return new MovieInfo[size];
         }
     };
+    public int position;
     public String title;
     public String release_date;
     public String poster;
     public float vote;
-    /*Comparator for sorting the list by vote rating*/
-    public static Comparator<MovieInfo> movieVote = new Comparator<MovieInfo>() {
-
-        public int compare(MovieInfo s1, MovieInfo s2) {
-
-            float vote1 = s1.vote;
-            float vote2 = s2.vote;
-
-	        /*For Descending order*/
-            return Float.compare(vote2, vote1);
-
-        }
-    };
+    public boolean favorite;
     public String synopsis;
     public float popularity;
-    /*Comparator for sorting the list by popularity*/
-    public static Comparator<MovieInfo> moviePop = new Comparator<MovieInfo>() {
-
-        public int compare(MovieInfo s1, MovieInfo s2) {
-
-            float popularity1 = s1.popularity;
-            float popularity2 = s2.popularity;
-
-	        /*For Descending order*/
-            return Float.compare(popularity2, popularity1);
-
-        }
-    };
     public String id;
+    public ArrayList<MovieByIdInfo> trailerData;
+    public ArrayList<MovieByIdInfo> reviewData;
 
-    public MovieInfo(String title,
+    public MovieInfo(int position,
+                     String title,
                      String release_date,
                      String poster,
                      float vote,
                      String synopsis,
                      float popularity,
-                     String id) {
+                     String id,
+                     boolean favorite,
+                     ArrayList<MovieByIdInfo> trailerData,
+                     ArrayList<MovieByIdInfo> reviewData) {
 
+        this.position = position;
         this.title = title;
         this.release_date = release_date;
         this.poster = poster;
@@ -73,9 +56,13 @@ public class MovieInfo implements Parcelable {
         this.synopsis = synopsis;
         this.popularity = popularity;
         this.id = id;
+        this.favorite = favorite;
+        this.trailerData = trailerData;
+        this.reviewData = reviewData;
     }
 
     public MovieInfo(Parcel in) {
+        this.position = in.readInt();
         this.title = in.readString();
         this.release_date = in.readString();
         this.poster = in.readString();
@@ -83,6 +70,10 @@ public class MovieInfo implements Parcelable {
         this.synopsis = in.readString();
         this.popularity = in.readFloat();
         this.id = in.readString();
+        this.favorite = in.readByte() != 0;
+
+        this.trailerData = in.readArrayList(null);
+        this.reviewData = in.readArrayList(null);
     }
 
     @Override
@@ -94,6 +85,7 @@ public class MovieInfo implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
+        dest.writeInt(position);
         dest.writeString(title);
         dest.writeString(release_date);
         dest.writeString(poster);
@@ -101,7 +93,9 @@ public class MovieInfo implements Parcelable {
         dest.writeString(synopsis);
         dest.writeFloat(popularity);
         dest.writeString(id);
+        dest.writeInt(favorite ? 1 : 0);
+        dest.writeList(trailerData);
+        dest.writeList(reviewData);
     }
-
 }
 
