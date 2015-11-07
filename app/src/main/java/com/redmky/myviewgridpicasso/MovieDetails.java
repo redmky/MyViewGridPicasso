@@ -13,7 +13,10 @@ import android.widget.Toast;
 import android.app.Application;
 
 import com.redmky.myviewgridpicasso.Data.ArchivedMovieColumns;
+import com.redmky.myviewgridpicasso.Data.MovieDatabase;
 import com.redmky.myviewgridpicasso.Data.MovieProvider;
+
+import java.util.ArrayList;
 
 /**
  * Created by redmky on 10/19/2015.
@@ -30,22 +33,27 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
 
         // Add this line in order for this fragment to handle menu events.
         setContentView(com.redmky.myviewgridpicasso.R.layout.activity_details);
+        final MovieInfo movieInfo;
 
         android.content.Intent intent = getIntent();
         if (intent != null) {
 
-            final int position = intent.getIntExtra("position",0);
-            final String image = intent.getStringExtra("image");
-            final String title = intent.getStringExtra("title");
-            final float vote = intent.getFloatExtra("vote", 0);
-            float popularity = intent.getFloatExtra("pop", 0);
-            final String synopsys = intent.getStringExtra("synopsis");
-            final String releaseDate = intent.getStringExtra("releaseDate");
-            final String id = intent.getStringExtra("id");
-            final boolean favorite = intent.getBooleanExtra("favorite", false);
-            trailerUrl = intent.getStringExtra("trailerUrl");
-            mReviewData =
-                    (java.util.ArrayList<MovieByIdInfo>) intent.getSerializableExtra("reviews");
+            movieInfo = (MovieInfo)getIntent().getSerializableExtra("movieInfo");
+
+            final int position = movieInfo.position;
+            final String image = movieInfo.poster;
+            final String title = movieInfo.title;
+            final float vote = movieInfo.vote;
+            float popularity = movieInfo.popularity;
+            final String synopsis = movieInfo.synopsis;
+            final String releaseDate = movieInfo.release_date;
+            final String id = movieInfo.id;
+            final boolean favorite = movieInfo.favorite;
+
+            MovieByIdInfo trailerData = movieInfo.trailerData.get(0);
+            trailerUrl = trailerData.key;
+
+            mReviewData = movieInfo.reviewData;
 
             //initialize and set the image description
             android.widget.TextView titleTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_title_textview);
@@ -57,7 +65,7 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
             android.widget.TextView rDateTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_releaseDate_textview);
             rDateTextView.setText("Release Date: " + String.valueOf(releaseDate));
             android.widget.TextView synopsisTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_synopsis_textview);
-            synopsisTextView.setText(synopsys);
+            synopsisTextView.setText(synopsis);
 
             //Set image url
             android.widget.ImageView imageView = (android.widget.ImageView) findViewById(R.id.movie_item_poster);
@@ -107,7 +115,7 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
                         favChange[0] = false;
                         //TODO: remove from favorites
                     } else {
-                        insertToFavorites(mC, image, title, vote, synopsys, releaseDate, id);
+                        MovieDatabase.insertToFavorites(mC, movieInfo);
                         button.setText("Added to Favorites");
                         favChange[0] = true;
 
@@ -122,30 +130,6 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
         }
     }
 
-
-    public static void insertToFavorites(Context mC, String image,
-                                         String title,
-                                         float votes,
-                                         String synopsys,
-                                         String releaseDate,
-                                         String id){
-
-        ContentValues cv = new ContentValues();
-
-        //cv.put(ArchivedMovieColumns._ID, 1);
-        cv.put(ArchivedMovieColumns.NAME, title);
-        cv.put(ArchivedMovieColumns.IMAGE_RESOURCE, image);
-        cv.put(ArchivedMovieColumns.VOTES, votes);
-        cv.put(ArchivedMovieColumns.SYNOPSYS, synopsys);
-        cv.put(ArchivedMovieColumns.RELEASE_DATE, releaseDate);
-        cv.put(ArchivedMovieColumns.MOVIE_ID, id);
-
-        Uri uri = mC.getContentResolver().insert(MovieProvider.ArchivedMovies.CONTENT_URI, cv);
-
-        Toast.makeText(((Activity)mC).getBaseContext(),
-                uri.toString(), Toast.LENGTH_LONG).show();
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

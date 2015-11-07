@@ -1,8 +1,11 @@
 package com.redmky.myviewgridpicasso;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
@@ -11,9 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.redmky.myviewgridpicasso.Data.MovieDatabase;
 import com.redmky.myviewgridpicasso.R.layout;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class MainActivity extends android.support.v7.app.ActionBarActivity {
@@ -69,8 +75,26 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 mMovieItem = (MovieInfo) parent.getItemAtPosition(position);
                 mMovieItem.position = position;
 
-                //get the url for the movie trailer
-                getReviewsAndTrailerUrl(mMovieItem.id, mMovieItem);
+                //todo: search db 1st
+
+                if (mMovieItem.trailerData == null) {
+                    //only get data if there is internet connection
+                    ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                    if (activeNetwork != null) { // connected to the internet
+
+                        //get the url for the movie trailer
+                        getReviewsAndTrailerUrl(mMovieItem.id, mMovieItem);
+                    }
+                    else {
+                        Toast.makeText(((Activity) mContext).getBaseContext(),
+                                "Please Connect To The Internet!", Toast.LENGTH_LONG).show();
+                    }
+                }
+                else{
+                    //get data from db
+                    movieDetailActivity();
+                }
 
             }
         });
@@ -80,7 +104,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     //Get Movie Data
     public static void getMovieData(String sortBy) {
         //call to get movie data
-        FetchMovieTask movieTask = new FetchMovieTask(mMovieData, mGridAdapter);
+        FetchMovieTask movieTask = new FetchMovieTask(mContext, mMovieData, mGridAdapter);
         movieTask.execute(sortBy);
     }
 
@@ -157,19 +181,9 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
             //Pass the image title and url to DetailsActivity
             android.content.Intent intent = new android.content.Intent(mContext, com.redmky.myviewgridpicasso.MovieDetails.class);
-            intent.putExtra("position", mMovieItem.position );
-            intent.putExtra("title", mMovieItem.title);
-            intent.putExtra("image", mMovieItem.poster);
-            intent.putExtra("vote", mMovieItem.vote);
-            intent.putExtra("pop", mMovieItem.popularity);
-            intent.putExtra("synopsis", mMovieItem.synopsis);
-            intent.putExtra("releaseDate", mMovieItem.release_date);
-            intent.putExtra("trailerUrl", trailerUrl);
-            intent.putExtra("reviews", mMovieItem.reviewData);
-            intent.putExtra("id", mMovieItem.id);
-            intent.putExtra("favorite", mMovieItem.favorite);
-            //need  startActivityForResult to keep track of favorites, data send back to mainActivity
-            // mContext.startActivity(intent);
+
+            intent.putExtra("movieInfo", (Serializable)mMovieItem);
+
             int mRequestCode = 100;
             ((Activity) mContext).startActivityForResult(intent, mRequestCode);
         }
@@ -208,57 +222,62 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 .into(imageView);
 
 
-        //intent to play trailer
-        MovieByIdInfo tempMovieInfo = mMovieItem.trailerData.get(0);
-        final String trailerUrl = tempMovieInfo.key;
-        //todo use the array instead of one item
-        if (!trailerUrl.equals("none")) {
-            android.widget.LinearLayout TrailerLayout = (android.widget.LinearLayout) ((Activity)mContext).findViewById(com.redmky.myviewgridpicasso.R.id.trailer_layout);
-            TrailerLayout.setOnClickListener(new android.view.View.OnClickListener() {
-                public void onClick(android.view.View v) {
-                    android.content.Intent intentTrailer = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(trailerUrl));
-                    mContext.startActivity(intentTrailer);
+
+        //display data if data is not null
+        //if null then don't even try to add it to favorites
+        if(mMovieItem.trailerData != null && mMovieItem.reviewData != null) {
+            //intent to play trailer
+            MovieByIdInfo tempMovieInfo = mMovieItem.trailerData.get(0);
+            final String trailerUrl = tempMovieInfo.key;
+            //todo use the array instead of one item
+            if (!trailerUrl.equals("none")) {
+                android.widget.LinearLayout TrailerLayout = (android.widget.LinearLayout) ((Activity) mContext).findViewById(com.redmky.myviewgridpicasso.R.id.trailer_layout);
+                TrailerLayout.setOnClickListener(new android.view.View.OnClickListener() {
+                    public void onClick(android.view.View v) {
+                        android.content.Intent intentTrailer = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(trailerUrl));
+                        mContext.startActivity(intentTrailer);
+                    }
+                });
+            }
+
+
+            // Create the adapter for the movie reviews data
+            ReviewsAdapter adapter = new ReviewsAdapter(mContext, mMovieItem.reviewData);
+            // Attach the adapter to a ListView
+            android.widget.ListView RlistView =
+                    (android.widget.ListView) ((Activity) mContext).findViewById(R.id.listview_reviews);
+            RlistView.setAdapter(adapter);
+
+            //if button click add to favorite
+            //save movie details to database
+            final Button button = (Button) ((Activity) mContext).findViewById(R.id.buttonFavorite);
+            final boolean[] favChange = {favorite};
+
+            if (favorite) {
+                button.setText("Remove From Favorites");
+            } else {
+                button.setText("Add to Favorites");
+            }
+
+            button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    // Perform action on click
+                    if (favorite) {
+                        button.setText("Removed From Favorites");
+                        favChange[0] = false;
+                        //TODO: remove from favorites
+                    } else {
+                        MovieDatabase.insertToFavorites(mContext, mMovieItem);
+                        button.setText("Added to Favorites");
+
+                        MovieInfo tempInfo = mMovieData.get(position);
+                        tempInfo.favorite = true;
+                        mMovieData.set(position, tempInfo);
+
+                    }
                 }
             });
         }
-
-        // Create the adapter for the movie reviews data
-        ReviewsAdapter adapter = new ReviewsAdapter(mContext, mMovieItem.reviewData);
-        // Attach the adapter to a ListView
-        android.widget.ListView RlistView =
-                (android.widget.ListView) ((Activity)mContext).findViewById(R.id.listview_reviews);
-        RlistView.setAdapter(adapter);
-
-        //if button click add to favorite
-        //save movie details to database
-        final Button button = (Button) ((Activity)mContext).findViewById(R.id.buttonFavorite);
-        final boolean[] favChange = {favorite};
-
-        if (favorite) {
-            button.setText("Remove From Favorites");
-        }
-        else {
-            button.setText("Add to Favorites");
-        }
-
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Perform action on click
-                if (favorite) {
-                    button.setText("Removed From Favorites");
-                    favChange[0] = false;
-                    //TODO: remove from favorites
-                } else {
-                    MovieDetails.insertToFavorites(mContext, image, title, vote, synopsys, releaseDate, id);
-                    button.setText("Added to Favorites");
-
-                    MovieInfo tempInfo = mMovieData.get(position);
-                    tempInfo.favorite = true;
-                    mMovieData.set(position, tempInfo);
-
-                }
-            }
-        });
     }
 
     @Override

@@ -177,7 +177,7 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
         } else if (movieArray.length() == 0) {
             //no trailer available
             resultStrs = new MovieByIdInfo[1];
-            resultStrs[0] = new MovieByIdInfo(id, "No Trailers Available.", "movies");
+            resultStrs[0] = new MovieByIdInfo(id, "No Trailers Available.", "trailer");
         }
 
         return resultStrs;

@@ -1,6 +1,9 @@
 package com.redmky.myviewgridpicasso;
 
+import android.content.Context;
 import android.database.Cursor;
+
+import com.redmky.myviewgridpicasso.Data.MovieDatabase;
 
 import java.util.ArrayList;
 
@@ -12,12 +15,13 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
     //private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
     private ArrayList<MovieInfo> mMovieData;
+    private Context mContex;
     private MyImageAdapter mGridAdapter;
 
-    public FetchMovieTask(ArrayList<MovieInfo> mMovieData, MyImageAdapter mGridAdapter) {
+    public FetchMovieTask(Context mContex, ArrayList<MovieInfo> mMovieData, MyImageAdapter mGridAdapter) {
         this.mMovieData = mMovieData;
+        this.mContex = mContex;
         this.mGridAdapter = mGridAdapter;
-
     }
 
     @Override
@@ -54,7 +58,7 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
 
             if(params[0].compareTo("favorite") == 0 )
             {
-                return mGridAdapter.getDBContent();
+                return MovieDatabase.getDBContent(mContex);
             }
             else {
 

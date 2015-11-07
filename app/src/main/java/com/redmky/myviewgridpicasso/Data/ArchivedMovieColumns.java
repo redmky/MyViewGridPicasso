@@ -32,6 +32,5 @@ public interface ArchivedMovieColumns {
     String MOVIE_ID =
             "movie_id";
 
-
-
 }
+

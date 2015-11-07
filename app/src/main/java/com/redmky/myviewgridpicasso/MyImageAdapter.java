@@ -87,38 +87,5 @@ public class MyImageAdapter extends android.widget.ArrayAdapter<MovieInfo> {
 
         return imageView;
     }
-
-    public MovieInfo[] getDBContent()
-    {
-        Cursor cursor =
-                mContext.getContentResolver().query(MovieProvider.ArchivedMovies.CONTENT_URI,
-                        null, null, null, null);
-
-        mMovieData.clear();
-
-        MovieInfo[] resultStrs = new MovieInfo[cursor.getCount()];
-        int i = 0;
-
-        while (cursor.moveToNext()) {
-            // Extract data.
-            String title = cursor.getString(cursor.getColumnIndex(ArchivedMovieColumns.NAME));
-            String release_date =
-                    cursor.getString(cursor.getColumnIndex(ArchivedMovieColumns.RELEASE_DATE));
-            String poster =
-                    cursor.getString(cursor.getColumnIndex(ArchivedMovieColumns.IMAGE_RESOURCE));
-            float vote = cursor.getFloat(cursor.getColumnIndex(ArchivedMovieColumns.VOTES));
-            String synopsys =
-                    cursor.getString(cursor.getColumnIndex(ArchivedMovieColumns.SYNOPSYS));
-            String id = cursor.getString(cursor.getColumnIndex(ArchivedMovieColumns.MOVIE_ID));
-            boolean favorite = true;
-
-            MovieInfo movieItem =
-                    new MovieInfo(i, title, release_date,
-                            poster, vote, synopsys, 0,id,favorite,null, null);
-
-            resultStrs[i++] = movieItem;
-        }
-        return resultStrs;
-    }
 }
 
