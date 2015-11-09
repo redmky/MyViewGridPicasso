@@ -25,21 +25,27 @@ import java.util.ArrayList;
 @Database(version = MovieDatabase.VERSION)
 public final class MovieDatabase {
     private static final String LOG_TAG = MovieDatabase.class.getSimpleName();
-    private MovieDatabase(){}
+
+    private MovieDatabase() {
+    }
+
     public static final int VERSION = 1;
 
-        @Table(ArchivedMovieColumns.class) public static final String ARCHIVED_MOVIES =
+    @Table(ArchivedMovieColumns.class)
+    public static final String ARCHIVED_MOVIES =
             "archived_movies";
 
-        @Table(ArchivedChildColumns.class) public static final String ARCHIVED_REVIEWS =
+    @Table(ArchivedChildColumns.class)
+    public static final String ARCHIVED_REVIEWS =
             "archived_reviews";
 
-        @Table(ArchivedChildColumns.class) public static final String ARCHIVED_TRAILERS =
+    @Table(ArchivedChildColumns.class)
+    public static final String ARCHIVED_TRAILERS =
             "archived_trailers";
 
 
     //insert to DB
-    public static void insertToFavorites(Context mC, MovieInfo movieInfo){
+    public static void insertToFavorites(Context mC, MovieInfo movieInfo) {
 
         ContentValues cv = new ContentValues();
 
@@ -60,13 +66,13 @@ public final class MovieDatabase {
 
     }
 
-    public static void insertReviewsToFavorites(Context mC, MovieInfo movieInfo){
+    public static void insertReviewsToFavorites(Context mC, MovieInfo movieInfo) {
         Log.d(LOG_TAG, "insert");
 
         ArrayList<ContentProviderOperation> batchOperations =
                 new ArrayList<>(movieInfo.reviewData.size());
 
-        for (MovieByIdInfo review: movieInfo.reviewData) {
+        for (MovieByIdInfo review : movieInfo.reviewData) {
             ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
                     MovieProvider.ArchivedReviews.CONTENT_URI);
 
@@ -75,20 +81,20 @@ public final class MovieDatabase {
             batchOperations.add(builder.build());
         }
 
-        try{
+        try {
             mC.getContentResolver().applyBatch(MovieProvider.AUTHORITY, batchOperations);
-        } catch(RemoteException | OperationApplicationException e){
+        } catch (RemoteException | OperationApplicationException e) {
             Log.e(LOG_TAG, "Error applying batch insert", e);
         }
     }
 
-    public static void insertTrailersToFavorites(Context mC, MovieInfo movieInfo){
+    public static void insertTrailersToFavorites(Context mC, MovieInfo movieInfo) {
         Log.d(LOG_TAG, "insert");
 
         ArrayList<ContentProviderOperation> batchOperations =
                 new ArrayList<>(movieInfo.trailerData.size());
 
-        for (MovieByIdInfo trailer: movieInfo.trailerData) {
+        for (MovieByIdInfo trailer : movieInfo.trailerData) {
             ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
                     MovieProvider.ArchivedTrailers.CONTENT_URI);
 
@@ -97,16 +103,15 @@ public final class MovieDatabase {
             batchOperations.add(builder.build());
         }
 
-        try{
+        try {
             mC.getContentResolver().applyBatch(MovieProvider.AUTHORITY, batchOperations);
-        } catch(RemoteException | OperationApplicationException e){
+        } catch (RemoteException | OperationApplicationException e) {
             Log.e(LOG_TAG, "Error applying batch insert", e);
         }
     }
 
     //get database contents
-    public static MovieInfo[] getDBContent(Context mC)
-    {
+    public static MovieInfo[] getDBContent(Context mC) {
         Cursor cursor =
                 mC.getContentResolver().query(MovieProvider.ArchivedMovies.CONTENT_URI,
                         null, null, null, null);
@@ -129,45 +134,45 @@ public final class MovieDatabase {
 
             //get trailer info
 
-                Cursor cursorReview =
-                        mC.getContentResolver().query(MovieProvider.ArchivedReviews.CONTENT_URI,
-                                null, null, null, null);
+            Cursor cursorReview =
+                    mC.getContentResolver().query(MovieProvider.ArchivedReviews.CONTENT_URI,
+                            null, null, null, null);
 
-                ArrayList<MovieByIdInfo> resultReviewStrs = new ArrayList<MovieByIdInfo>();
+            ArrayList<MovieByIdInfo> resultReviewStrs = new ArrayList<MovieByIdInfo>();
 
-                MovieByIdInfo reviewItem = null;
-                while (cursorReview.moveToNext()) {
-                    // Extract data.
-                    String review = cursorReview.getString(cursorReview.getColumnIndex(ArchivedChildColumns.review));
+            MovieByIdInfo reviewItem = null;
+            while (cursorReview.moveToNext()) {
+                // Extract data.
+                String review = cursorReview.getString(cursorReview.getColumnIndex(ArchivedChildColumns.review));
 
-                    reviewItem = new MovieByIdInfo(id, review, "review");
-                    resultReviewStrs.add(reviewItem);
-                }
+                reviewItem = new MovieByIdInfo(id, review, "review");
+                resultReviewStrs.add(reviewItem);
+            }
 
             // end of trailer
 
             //get review info
 
-                Cursor cursorTrailer =
-                        mC.getContentResolver().query(MovieProvider.ArchivedTrailers.CONTENT_URI,
-                                null, null, null, null);
+            Cursor cursorTrailer =
+                    mC.getContentResolver().query(MovieProvider.ArchivedTrailers.CONTENT_URI,
+                            null, null, null, null);
 
-                ArrayList<MovieByIdInfo> resultTrailerStrs = new ArrayList<MovieByIdInfo>();
+            ArrayList<MovieByIdInfo> resultTrailerStrs = new ArrayList<MovieByIdInfo>();
 
-                MovieByIdInfo trailerItem = null;
-                while (cursorTrailer.moveToNext()) {
-                    // Extract data.
-                    String review = cursorTrailer.getString(cursorTrailer.getColumnIndex(ArchivedChildColumns.review));
+            MovieByIdInfo trailerItem = null;
+            while (cursorTrailer.moveToNext()) {
+                // Extract data.
+                String review = cursorTrailer.getString(cursorTrailer.getColumnIndex(ArchivedChildColumns.review));
 
-                    trailerItem = new MovieByIdInfo(id, review, "trailer");
-                    resultTrailerStrs.add(trailerItem);
-                }
+                trailerItem = new MovieByIdInfo(id, review, "trailer");
+                resultTrailerStrs.add(trailerItem);
+            }
 
             //end of review
 
             MovieInfo movieItem =
                     new MovieInfo(i, title, release_date,
-                            poster, vote, synopsys, 0,id,favorite,resultTrailerStrs, resultReviewStrs);
+                            poster, vote, synopsys, 0, id, favorite, resultTrailerStrs, resultReviewStrs);
 
             resultStrs[i++] = movieItem;
         }

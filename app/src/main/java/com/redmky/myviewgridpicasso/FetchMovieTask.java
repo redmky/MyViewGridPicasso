@@ -1,7 +1,6 @@
 package com.redmky.myviewgridpicasso;
 
 import android.content.Context;
-import android.database.Cursor;
 
 import com.redmky.myviewgridpicasso.Data.MovieDatabase;
 
@@ -25,124 +24,121 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
     }
 
     @Override
-        protected void onPostExecute(MovieInfo[] result) {
+    protected void onPostExecute(MovieInfo[] result) {
 
-            if (result != null) {
-                // mMovieAdapter.clear();
-                mMovieData.clear();
+        if (result != null) {
+            // mMovieAdapter.clear();
+            mMovieData.clear();
 
-                for (MovieInfo movieItem : result)
-                {
+            for (MovieInfo movieItem : result) {
 
-                    mMovieData.add(movieItem);
+                mMovieData.add(movieItem);
+            }
+
+            //to fresh the activity
+            mGridAdapter.setGridData(mMovieData);
+
+            //for newer version, calls notifydatachange less frequent
+            //speed up
+            // does not work???
+            //mMovieData.addAll(result);
+        }
+    }
+
+    @Override
+    protected MovieInfo[] doInBackground(String... params) {
+        // These two need to be declared outside the try/catch
+        // so that they can be closed in the finally block.
+        java.net.HttpURLConnection urlConnection = null;
+        java.io.BufferedReader reader = null;
+        // Will contain the raw JSON response as a string.
+        String movieJsonStr;
+
+        if (params[0].compareTo("favorite") == 0) {
+            return MovieDatabase.getDBContent(mContex);
+        } else {
+
+            try {
+                // Construct the URL for getting the Movie info
+
+                //http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=
+                android.net.Uri.Builder builder = new android.net.Uri.Builder();
+
+                builder.scheme("http")
+                        .authority("api.themoviedb.org")
+                        .appendPath("3")
+                        .appendPath("discover")
+                        .appendPath("movie")
+                        .appendQueryParameter("sort_by", params[0])
+                        .appendQueryParameter("api_key", "");
+
+                String myUrl = builder.build().toString();
+
+                //for debugging
+                //Log.v(LOG_TAG, "URL String: " + myUrl);
+
+                java.net.URL url = new java.net.URL(myUrl);
+
+                // Create the request to OpenWeatherMap, and open the connection
+                urlConnection = (java.net.HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                java.io.InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new java.io.BufferedReader(new java.io.InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
                 }
 
-                //to fresh the activity
-                mGridAdapter.setGridData(mMovieData);
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                movieJsonStr = buffer.toString();
 
-                //for newer version, calls notifydatachange less frequent
-                //speed up
-                // does not work???
-                //mMovieData.addAll(result);
-            }
-        }
-
-        @Override
-        protected MovieInfo[] doInBackground(String... params) {
-            // These two need to be declared outside the try/catch
-            // so that they can be closed in the finally block.
-            java.net.HttpURLConnection urlConnection = null;
-            java.io.BufferedReader reader = null;
-            // Will contain the raw JSON response as a string.
-            String movieJsonStr;
-
-            if(params[0].compareTo("favorite") == 0 )
-            {
-                return MovieDatabase.getDBContent(mContex);
-            }
-            else {
+                //debug only
+                //adding to verify the data return once refresh is press
+                //Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr);
 
                 try {
-                    // Construct the URL for getting the Movie info
+                    return getMovieDataFromJson(movieJsonStr);
+                } catch (org.json.JSONException exception) {
 
-                    //http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=
-                    android.net.Uri.Builder builder = new android.net.Uri.Builder();
+                }
 
-                    builder.scheme("http")
-                            .authority("api.themoviedb.org")
-                            .appendPath("3")
-                            .appendPath("discover")
-                            .appendPath("movie")
-                            .appendQueryParameter("sort_by", params[0])
-                            .appendQueryParameter("api_key", "");
-
-                    String myUrl = builder.build().toString();
-
-                    //for debugging
-                    //Log.v(LOG_TAG, "URL String: " + myUrl);
-
-                    java.net.URL url = new java.net.URL(myUrl);
-
-                    // Create the request to OpenWeatherMap, and open the connection
-                    urlConnection = (java.net.HttpURLConnection) url.openConnection();
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.connect();
-
-                    // Read the input stream into a String
-                    java.io.InputStream inputStream = urlConnection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
-                    if (inputStream == null) {
-                        // Nothing to do.
-                        return null;
-                    }
-                    reader = new java.io.BufferedReader(new java.io.InputStreamReader(inputStream));
-
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                        // But it does make debugging a *lot* easier if you print out the completed
-                        // buffer for debugging.
-                        buffer.append(line + "\n");
-                    }
-
-                    if (buffer.length() == 0) {
-                        // Stream was empty.  No point in parsing.
-                        return null;
-                    }
-                    movieJsonStr = buffer.toString();
-
-                    //debug only
-                    //adding to verify the data return once refresh is press
-                    //Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr);
-
+            } catch (java.io.IOException e) {
+                android.util.Log.e("DetailFragment", "Error ", e);
+                // If the code didn't successfully get the weather data,
+                //there's no point in attempting
+                // to parse it.
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
                     try {
-                        return getMovieDataFromJson(movieJsonStr);
-                    } catch (org.json.JSONException exception) {
-
-                    }
-
-                } catch (java.io.IOException e) {
-                    android.util.Log.e("DetailFragment", "Error ", e);
-                    // If the code didn't successfully get the weather data,
-                    //there's no point in attempting
-                    // to parse it.
-                    return null;
-                } finally {
-                    if (urlConnection != null) {
-                        urlConnection.disconnect();
-                    }
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (final java.io.IOException e) {
-                            android.util.Log.e("DetailFragment", "Error closing stream", e);
-                        }
+                        reader.close();
+                    } catch (final java.io.IOException e) {
+                        android.util.Log.e("DetailFragment", "Error closing stream", e);
                     }
                 }
             }
-
-            return null;
         }
+
+        return null;
+    }
 
     private MovieInfo[] getMovieDataFromJson(String forecastJsonStr)
             throws org.json.JSONException {
@@ -191,7 +187,7 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
             MovieInfo movie =
                     new MovieInfo(i, title,
                             release_date, poster, vote,
-                            synopsis, popularity, id, favorite,null,null);
+                            synopsis, popularity, id, favorite, null, null);
 
             resultStrs[i] = movie;
         }

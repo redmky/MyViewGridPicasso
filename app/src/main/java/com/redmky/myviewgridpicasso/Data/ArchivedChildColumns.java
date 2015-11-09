@@ -10,14 +10,17 @@ import net.simonvt.schematic.annotation.PrimaryKey;
  */
 public interface ArchivedChildColumns {
 
-        @DataType(DataType.Type.INTEGER) @PrimaryKey
-        @AutoIncrement
-        String _ID =
-                "_id";
-        @DataType(DataType.Type.TEXT) @NotNull
-        String MOVIE_ID =
-                "movieId";
-        @DataType(DataType.Type.TEXT) @NotNull
-        String review =
-                "review";
+    @DataType(DataType.Type.INTEGER)
+    @PrimaryKey
+    @AutoIncrement
+    String _ID =
+            "_id";
+    @DataType(DataType.Type.TEXT)
+    @NotNull
+    String MOVIE_ID =
+            "movieId";
+    @DataType(DataType.Type.TEXT)
+    @NotNull
+    String review =
+            "review";
 }

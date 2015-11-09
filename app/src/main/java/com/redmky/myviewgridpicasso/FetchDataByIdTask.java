@@ -1,11 +1,5 @@
 package com.redmky.myviewgridpicasso;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.view.View;
-import android.widget.Button;
-
 import java.util.ArrayList;
 
 import static java.util.Collections.addAll;
@@ -18,13 +12,13 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
 
     //private final String LOG_TAG = FetchDataByIdTask.class.getSimpleName();
 
-   // private java.util.ArrayList<MovieByIdInfo> mTrailerData;
-   // private java.util.ArrayList<MovieByIdInfo> mReviewData;
+    // private java.util.ArrayList<MovieByIdInfo> mTrailerData;
+    // private java.util.ArrayList<MovieByIdInfo> mReviewData;
 
     //for holding info of what item the user clicked
     private MovieInfo mMovieItem;
 
-    public FetchDataByIdTask( MovieInfo movieItem) {
+    public FetchDataByIdTask(MovieInfo movieItem) {
         this.mMovieItem = movieItem;
     }
 
@@ -50,7 +44,6 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
             }
         }
     }
-
 
     @Override
     protected MovieByIdInfo[] doInBackground(String... params) {
