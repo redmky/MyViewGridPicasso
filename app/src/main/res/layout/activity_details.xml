@@ -170,7 +170,14 @@
                 android:layout_height="0dp"
                 android:layout_weight="2"
                 android:gravity="center_horizontal"
-                android:orientation="horizontal">
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/list_item_review_textview">
+                </TextView>
 
                 <ListView
                     android:id="@+id/listview_reviews"
