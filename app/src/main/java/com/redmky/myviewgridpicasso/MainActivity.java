@@ -27,7 +27,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     protected android.widget.GridView mGridView;
     static MovieInfo mMovieItem;
     ShareActionProvider myShareActionProvider;
-    public final static String PAR_KEY = "movieInfo.par";
+    public  final static String PAR_KEY = "movieInfo.par";
 
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState) {
@@ -42,13 +42,13 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                     (java.util.ArrayList<MovieInfo>)
                             savedInstanceState.get("MOVIE_KEY");
 
-            mMovieItem = (MovieInfo) savedInstanceState.get("MOVIE_ITEM");
+            mMovieItem = (MovieInfo)savedInstanceState.get("MOVIE_ITEM");
 
             mGridAdapter = new MyImageAdapter(this, layout.item_list, mMovieData);
 
             //todo clean get detail activity if change from popular to fav
             //Start details activity
-            if (isTwoPane()) {
+            if(isTwoPane()) {
 
                 setDetailActivity();
             }
@@ -101,13 +101,12 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
             }
         });
     }
-
     // Call to update the share intent
     public static Intent setShareIntent(MovieInfo movieInfo) {
 
-        Intent shareIntent = null;
+        Intent shareIntent=null;
 
-        if (movieInfo != null && movieInfo.trailerData != null) {
+        if(movieInfo != null && movieInfo.trailerData != null) {
             MovieByIdInfo tempMovieInfo = movieInfo.trailerData.get(0);
             final String trailerUrl = tempMovieInfo.key;
             if (!trailerUrl.equals("none")) {
@@ -205,10 +204,11 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     public static void movieDetailActivity() {
 
         //Start details activity
-        if (isTwoPane()) {
+        if(isTwoPane()) {
 
             setDetailActivity();
-        } else {
+        }
+        else {
             //Pass the image title and url to DetailsActivity
 
             Intent mIntent = new Intent(mContext, MovieDetails.class);
@@ -221,7 +221,8 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         }
     }
 
-    public static void setDetailActivity() {
+    public static void setDetailActivity()
+    {
         final int position = mMovieItem.position;
         final String image = mMovieItem.poster;
         final String title = mMovieItem.title;
@@ -234,29 +235,29 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
         //initialize and set the image description
         android.widget.TextView titleTextView = (android.widget.TextView)
-                ((Activity) mContext).findViewById
+                ((Activity)mContext).findViewById
                         (com.redmky.myviewgridpicasso.R.id.list_item_title_textview);
         titleTextView.setText(title);
         android.widget.TextView voteTextView = (android.widget.TextView)
-                ((Activity) mContext).findViewById
+                ((Activity)mContext).findViewById
                         (com.redmky.myviewgridpicasso.R.id.list_item_vote_textview);
         voteTextView.setText("Rating: " + String.valueOf(vote));
         android.widget.TextView popTextView = (android.widget.TextView)
-                ((Activity) mContext).findViewById
+                ((Activity)mContext).findViewById
                         (com.redmky.myviewgridpicasso.R.id.list_item_popularity_textview);
         popTextView.setText("Popularity: " + String.valueOf(popularity));
         android.widget.TextView rDateTextView = (android.widget.TextView)
-                ((Activity) mContext).findViewById
+                ((Activity)mContext).findViewById
                         (com.redmky.myviewgridpicasso.R.id.list_item_releaseDate_textview);
         rDateTextView.setText("Release Date: " + String.valueOf(releaseDate));
         android.widget.TextView synopsisTextView = (android.widget.TextView)
-                ((Activity) mContext).findViewById
+                ((Activity)mContext).findViewById
                         (com.redmky.myviewgridpicasso.R.id.list_item_synopsis_textview);
         synopsisTextView.setText(synopsys);
 
         //Set image url
         android.widget.ImageView imageView =
-                (android.widget.ImageView) ((Activity) mContext).findViewById(R.id.movie_item_poster);
+                (android.widget.ImageView)((Activity)mContext).findViewById(R.id.movie_item_poster);
         com.squareup.picasso.Picasso.with(mContext)
                 .load(image)
                 .placeholder(com.redmky.myviewgridpicasso.R.mipmap.ic_downloading)
@@ -265,7 +266,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
         //display data if data is not null
         //if null then don't even try to add it to favorites
-        if (mMovieItem.trailerData != null && mMovieItem.reviewData != null) {
+        if(mMovieItem.trailerData != null && mMovieItem.reviewData != null) {
             //intent to play trailer
             MovieByIdInfo tempMovieInfo = mMovieItem.trailerData.get(0);
             final String trailerUrl = tempMovieInfo.key;
@@ -328,7 +329,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
             if (resultCode == Activity.RESULT_OK) {
-                int position = data.getIntExtra("position", 0);
+                int position = data.getIntExtra("position",0);
                 boolean fav = data.getBooleanExtra("favorite", false);
 
                 MovieInfo tempInfo = mMovieData.get(position);

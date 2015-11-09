@@ -7,5 +7,5 @@
         android:entries="@array/SpinnerEntry"
         android:entryValues="@array/SpinnerValue"
         android:key="@string/pref_movie_key"
-        android:title="@string/pref_movie_settings" />
+        android:title="@string/pref_movie_settings"/>
 </PreferenceScreen>

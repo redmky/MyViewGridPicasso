@@ -41,4 +41,3 @@ public interface ArchivedMovieColumns {
             "movie_id";
 
 }
-

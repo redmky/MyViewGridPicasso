@@ -30,7 +30,8 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
             // mMovieAdapter.clear();
             mMovieData.clear();
 
-            for (MovieInfo movieItem : result) {
+            for (MovieInfo movieItem : result)
+            {
 
                 mMovieData.add(movieItem);
             }
@@ -54,9 +55,11 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
         // Will contain the raw JSON response as a string.
         String movieJsonStr;
 
-        if (params[0].compareTo("favorite") == 0) {
+        if(params[0].compareTo("favorite") == 0 )
+        {
             return MovieDatabase.getDBContent(mContex);
-        } else {
+        }
+        else {
 
             try {
                 // Construct the URL for getting the Movie info
@@ -187,7 +190,7 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
             MovieInfo movie =
                     new MovieInfo(i, title,
                             release_date, poster, vote,
-                            synopsis, popularity, id, favorite, null, null);
+                            synopsis, popularity, id, favorite,null,null);
 
             resultStrs[i] = movie;
         }

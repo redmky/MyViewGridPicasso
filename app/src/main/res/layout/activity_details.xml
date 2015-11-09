@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_gravity="center_vertical"
@@ -26,7 +27,8 @@
             android:textColor="#ffffff"
             android:textIsSelectable="true"
             android:textSize="24dp"
-            android:textStyle="bold"></TextView>
+            android:textStyle="bold">
+        </TextView>
 
     </LinearLayout>
 
@@ -48,7 +50,8 @@
             android:gravity="center"
             android:text="@string/list_item_releaseDate_textview"
             android:textColor="#ffffff"
-            android:textSize="12dp"></TextView>
+            android:textSize="12dp">
+        </TextView>
     </LinearLayout>
 
     <LinearLayout
@@ -66,7 +69,7 @@
             android:adjustViewBounds="false"
             android:minHeight="200dp"
             android:minWidth="185dp"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"/>
 
     </LinearLayout>
 
@@ -97,21 +100,23 @@
                     android:layout_width="0dp"
                     android:layout_height="fill_parent"
                     android:layout_weight="2"
-                    android:text="@string/list_item_vote_textview"></TextView>
+                    android:text="@string/list_item_vote_textview">
+                </TextView>
 
                 <Button
                     android:id="@+id/buttonFavorite"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="@string/favorite_button" />
+                    android:text="@string/favorite_button"/>
 
                 <TextView
                     android:id="@+id/list_item_popularity_textview"
                     android:layout_width="0dp"
                     android:layout_height="fill_parent"
                     android:layout_weight="2"
-                    android:text="@string/list_item_popularity_textview"></TextView>
+                    android:text="@string/list_item_popularity_textview">
+                </TextView>
             </LinearLayout>
 
 
@@ -125,7 +130,8 @@
                     android:id="@+id/list_item_synopsis_textview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Synopsis"></TextView>
+                    android:text="Synopsis">
+                </TextView>
             </LinearLayout>
 
 
@@ -144,14 +150,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="@string/list_item_trailer_textview"></TextView>
+                    android:text="@string/list_item_trailer_textview">
+                </TextView>
 
                 <ImageView
                     android:id="@+id/movie_trailer_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
-                    android:src="@mipmap/ic_play" />
+                    android:src="@mipmap/ic_play"/>
 
 
             </LinearLayout>
@@ -169,7 +176,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="@string/list_item_review_textview"></TextView>
+                    android:text="@string/list_item_review_textview">
+                </TextView>
 
                 <ListView
                     android:id="@+id/listview_reviews"

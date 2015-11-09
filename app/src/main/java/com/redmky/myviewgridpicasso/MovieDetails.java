@@ -102,7 +102,8 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
 
             if (favorite) {
                 button.setText("Remove From Favorites");
-            } else {
+            }
+            else {
                 button.setText("Add to Favorites");
             }
 
@@ -154,11 +155,11 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
 
-            // Respond to the action bar's back button
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-        }
+        // Respond to the action bar's back button
+        case android.R.id.home:
+        onBackPressed();
+        return true;
+    }
 
         return super.onOptionsItemSelected(item);
     }

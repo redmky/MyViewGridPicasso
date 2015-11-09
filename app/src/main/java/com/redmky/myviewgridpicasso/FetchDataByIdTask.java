@@ -18,7 +18,7 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
     //for holding info of what item the user clicked
     private MovieInfo mMovieItem;
 
-    public FetchDataByIdTask(MovieInfo movieItem) {
+    public FetchDataByIdTask( MovieInfo movieItem) {
         this.mMovieItem = movieItem;
     }
 

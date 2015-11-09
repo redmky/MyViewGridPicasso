@@ -5,10 +5,13 @@ package com.redmky.myviewgridpicasso;
  */
 
 import android.content.Context;
+import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.redmky.myviewgridpicasso.Data.ArchivedMovieColumns;
+import com.redmky.myviewgridpicasso.Data.MovieProvider;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
