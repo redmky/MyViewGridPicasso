@@ -16,7 +16,6 @@
     <string name="pref_movie_label_rating" translatable="false">Vote Average</string>
     <string name="pref_movie_label_favorite" translatable="false">Favorite</string>
 
-
     <string name="title_activity_detail">Movie Details</string>
 
     <string name="list_item_vote_textview">Vote: </string>
@@ -25,6 +24,9 @@
     <string name="list_item_trailer_textview">Trailer: </string>
     <string name="list_item_review_textview">Reviews: </string>
     <string name="favorite_button">Add To Favorites</string>
+
+    <string name="share">Share</string>
+    <string name="ff">bundle</string>
 
 
 </resources>

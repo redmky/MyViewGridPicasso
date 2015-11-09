@@ -1,22 +1,14 @@
 package com.redmky.myviewgridpicasso;
 
-import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-import android.app.Application;
-
-import com.redmky.myviewgridpicasso.Data.ArchivedMovieColumns;
 import com.redmky.myviewgridpicasso.Data.MovieDatabase;
-import com.redmky.myviewgridpicasso.Data.MovieProvider;
-
-import java.util.ArrayList;
 
 /**
  * Created by redmky on 10/19/2015.
@@ -26,6 +18,7 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
 
     String trailerUrl;
     java.util.ArrayList<MovieByIdInfo> mReviewData;
+    MovieInfo movieInfo;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
@@ -33,12 +26,10 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
 
         // Add this line in order for this fragment to handle menu events.
         setContentView(com.redmky.myviewgridpicasso.R.layout.activity_details);
-        final MovieInfo movieInfo;
 
-        android.content.Intent intent = getIntent();
-        if (intent != null) {
 
-            movieInfo = (MovieInfo)getIntent().getSerializableExtra("movieInfo");
+        movieInfo = getIntent().getParcelableExtra(MainActivity.PAR_KEY);
+        if (movieInfo != null) {
 
             final int position = movieInfo.position;
             final String image = movieInfo.poster;
@@ -56,19 +47,25 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
             mReviewData = movieInfo.reviewData;
 
             //initialize and set the image description
-            android.widget.TextView titleTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_title_textview);
+            android.widget.TextView titleTextView = (android.widget.TextView)
+                    findViewById(com.redmky.myviewgridpicasso.R.id.list_item_title_textview);
             titleTextView.setText(title);
-            android.widget.TextView voteTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_vote_textview);
+            android.widget.TextView voteTextView = (android.widget.TextView)
+                    findViewById(com.redmky.myviewgridpicasso.R.id.list_item_vote_textview);
             voteTextView.setText("Rating: " + String.valueOf(vote));
-            android.widget.TextView popTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_popularity_textview);
+            android.widget.TextView popTextView = (android.widget.TextView)
+                    findViewById(com.redmky.myviewgridpicasso.R.id.list_item_popularity_textview);
             popTextView.setText("Popularity: " + String.valueOf(popularity));
-            android.widget.TextView rDateTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_releaseDate_textview);
+            android.widget.TextView rDateTextView = (android.widget.TextView)
+                    findViewById(com.redmky.myviewgridpicasso.R.id.list_item_releaseDate_textview);
             rDateTextView.setText("Release Date: " + String.valueOf(releaseDate));
-            android.widget.TextView synopsisTextView = (android.widget.TextView) findViewById(com.redmky.myviewgridpicasso.R.id.list_item_synopsis_textview);
+            android.widget.TextView synopsisTextView = (android.widget.TextView)
+                    findViewById(com.redmky.myviewgridpicasso.R.id.list_item_synopsis_textview);
             synopsisTextView.setText(synopsis);
 
             //Set image url
-            android.widget.ImageView imageView = (android.widget.ImageView) findViewById(R.id.movie_item_poster);
+            android.widget.ImageView imageView =
+                    (android.widget.ImageView) findViewById(R.id.movie_item_poster);
             com.squareup.picasso.Picasso.with(this)
                     .load(image)
                     .placeholder(com.redmky.myviewgridpicasso.R.mipmap.ic_downloading)
@@ -78,10 +75,13 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
 
             //intent to play trailer
             if (!trailerUrl.equals("none")) {
-                android.widget.LinearLayout TrailerLayout = (android.widget.LinearLayout) findViewById(com.redmky.myviewgridpicasso.R.id.trailer_layout);
+                android.widget.LinearLayout TrailerLayout = (android.widget.LinearLayout)
+                        findViewById(com.redmky.myviewgridpicasso.R.id.trailer_layout);
                 TrailerLayout.setOnClickListener(new android.view.View.OnClickListener() {
                     public void onClick(android.view.View v) {
-                        android.content.Intent intentTrailer = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(trailerUrl));
+                        android.content.Intent intentTrailer =
+                                new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                                        android.net.Uri.parse(trailerUrl));
                         startActivity(intentTrailer);
                     }
                 });
@@ -130,11 +130,20 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(com.redmky.myviewgridpicasso.R.menu.menu_main, menu);
+
+        //sharing
+        // Fetch and store ShareActionProvider
+
+        MenuItem shareItem = menu.findItem(R.id.share);
+        ShareActionProvider myShareActionProvider =
+                (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+
+        myShareActionProvider.setShareIntent(MainActivity.setShareIntent(movieInfo));
+
         return true;
     }
 
@@ -145,11 +154,7 @@ public class MovieDetails extends android.support.v7.app.ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
 
-        //added to work the mas as main back button press
-        //this will call onActivityResult
-        //super.onBackPressed();
-
-        // Respond to the action bar's Up/Home button
+        // Respond to the action bar's back button
         case android.R.id.home:
         onBackPressed();
         return true;

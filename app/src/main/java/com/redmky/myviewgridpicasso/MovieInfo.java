@@ -72,8 +72,8 @@ public class MovieInfo implements Parcelable {
         this.id = in.readString();
         this.favorite = in.readByte() != 0;
 
-        this.trailerData = in.readArrayList(null);
-        this.reviewData = in.readArrayList(null);
+        this.trailerData = in.readArrayList(MovieByIdInfo.class.getClassLoader());
+        this.reviewData = in.readArrayList(MovieByIdInfo.class.getClassLoader());
     }
 
     @Override

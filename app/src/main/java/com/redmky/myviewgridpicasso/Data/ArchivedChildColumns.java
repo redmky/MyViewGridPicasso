@@ -10,7 +10,6 @@ import net.simonvt.schematic.annotation.PrimaryKey;
  */
 public interface ArchivedChildColumns {
 
-
         @DataType(DataType.Type.INTEGER) @PrimaryKey
         @AutoIncrement
         String _ID =
