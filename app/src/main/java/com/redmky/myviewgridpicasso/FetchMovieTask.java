@@ -74,7 +74,7 @@ public class FetchMovieTask extends android.os.AsyncTask<String, Void, MovieInfo
                             .appendPath("discover")
                             .appendPath("movie")
                             .appendQueryParameter("sort_by", params[0])
-                            .appendQueryParameter("api_key", "44ef3f244772171afeaada468c1c1e85");
+                            .appendQueryParameter("api_key", "");
 
                     String myUrl = builder.build().toString();
 

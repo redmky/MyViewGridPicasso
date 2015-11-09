@@ -71,7 +71,7 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
                     .appendPath("movie")
                     .appendPath(params[0])
                     .appendPath(params[1])
-                    .appendQueryParameter("api_key", "44ef3f244772171afeaada468c1c1e85");
+                    .appendQueryParameter("api_key", "");
 
             String myUrl = builder.build().toString();
 
