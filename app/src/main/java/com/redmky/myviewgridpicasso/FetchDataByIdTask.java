@@ -34,7 +34,9 @@ public class FetchDataByIdTask extends android.os.AsyncTask<String, Void, MovieB
                 mMovieItem.trailerData = mTrailerData;
                 //call activity to display movie details
                 //at the moment we only care about one trailer
-                MainActivity.movieDetailActivity();
+                //MovieListFragment.movieDetailActivity();
+                
+                MovieListFragment.listener.onItemSelected(mMovieItem);
             } else if (result[0].mode.equals("reviews")) {
                 //mReviewData.clear();
 

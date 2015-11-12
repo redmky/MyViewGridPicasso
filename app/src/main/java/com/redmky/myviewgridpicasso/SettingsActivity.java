@@ -50,7 +50,7 @@ public class SettingsActivity extends android.preference.PreferenceActivity
             if (prefIndex >= 0) {
                 if (((android.preference.ListPreference) preference).getValue() != stringValue) {
                     //call to get movie data
-                    com.redmky.myviewgridpicasso.MainActivity.getMovieData(stringValue);
+                    com.redmky.myviewgridpicasso.MovieListFragment.getMovieData(stringValue);
                 }
 
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
